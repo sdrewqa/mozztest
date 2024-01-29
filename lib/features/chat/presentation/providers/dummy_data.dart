@@ -4,7 +4,7 @@ class ChatData {
       "userName": "Виктор Власов",
       "avatarUrl": "",
       "lastMessage": {
-        "text": "Уже сделал?",
+        "text": "Я2 вdsышел",
         "isMe": true,
         "timestamp": "2023-01-22T08:15:00Z",
         "read": false
@@ -16,7 +16,7 @@ class ChatData {
       "userName": "Саша Алексеев",
       "avatarUrl": "",
       "lastMessage": {
-        "text": "Я готов",
+        "text": "Я das",
         "isMe": false,
         "timestamp": "2024-01-22T08:40:00Z",
         "read": false
@@ -28,7 +28,7 @@ class ChatData {
       "userName": "Пётр Жаринов",
       "avatarUrl": "",
       "lastMessage": {
-        "text": "Я вышел",
+        "text": "Я вdышел",
         "isMe": true,
         "timestamp": "2024-01-22T08:43:00Z",
         "read": false
@@ -40,7 +40,7 @@ class ChatData {
       "userName": "Алина Жукова",
       "avatarUrl": "",
       "lastMessage": {
-        "text": "Я вышел",
+        "text": "Я daa",
         "isMe": true,
         "timestamp": "2024-01-22T09:45:00Z",
         "read": false
@@ -195,7 +195,7 @@ class ChatData {
       "chatId": 3,
       "messages": [
         {
-          "text": "Я das",
+          "text": "Я daa",
           "isMe": true,
           "timestamp": "2024-01-23T10:45:00Z",
           "read": false
