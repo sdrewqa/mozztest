@@ -1,95 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:mozztest/features/chat/presentation/providers/local_data.dart';
+import 'package:intl/intl.dart';
+import 'chats_provider.dart';
+import 'dummy_data.dart';
 
 class ChatProvider extends ChangeNotifier {
-  List<ChatViewModel> userChats =
-      ChatData.data.map((json) => ChatViewModel.fromJson(json)).toList();
-}
+  List<ChatModel> chats =
+      ChatData.chats.map((json) => ChatModel.fromJson(json)).toList();
 
+  ChatModel? binarySearchChats(int id) {
+    int low = 0;
+    int high = chats.length - 1;
 
+    while (low <= high) {
+      int mid = (low + high) ~/ 2;
+      int midId = chats[mid].chatId;
 
-
-// MODELS
-class ChatViewModel {
-  final String userName;
-  final String avatarUrl;
-  final MessageModel lastMessage;
-  final String lastActiveTime;
-  final AvatarPlaceholderModel avatarPlaceholder;
-
-  ChatViewModel(
-      {required this.userName,
-      required this.avatarUrl,
-      required this.lastMessage,
-      required this.lastActiveTime,
-      required this.avatarPlaceholder});
-
-  factory ChatViewModel.fromJson(Map<String, dynamic> json) {
-    return ChatViewModel(
-      userName: json['userName'],
-      avatarUrl: json['avatarUrl'],
-      lastMessage: MessageModel.fromJson(json['lastMessage']),
-      lastActiveTime: json['lastActiveTime'],
-      avatarPlaceholder: AvatarPlaceholderModel(
-        initials: AvatarPlaceholderModel._getInitials(json['userName']),
-        gradientColorsToBack:
-            AvatarPlaceholderModel._generateGradientColors(json['userName']),
-      ),
-    );
-  }
-}
-
-class AvatarPlaceholderModel {
-  final String initials;
-  final List<Color> gradientColorsToBack;
-  static String _getInitials(String fullName) {
-    List<String> nameSplit = fullName.split(" ");
-    String initials = "";
-    for (var name in nameSplit) {
-      if (name.isNotEmpty) {
-        initials += name[0].toUpperCase();
+      if (midId == id) {
+        return chats[mid];
+      } else if (midId < id) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
       }
     }
-    return initials;
+    return null;
   }
 
-  static List<Color> _generateGradientColors(String text) {
-    final int hash = text.hashCode;
-    final int r = (hash & 0xFF0000) >> 16;
-    final int g = (hash & 0x00FF00) >> 8;
-    final int b = hash & 0x0000FF;
-    int _brightenColorComponent(int component, int factor) {
-      return (component + factor).clamp(0, 255);
+  dynamic getTimeStamp(int index, List messages, timeStamp) {
+    var today = DateTime.now();
+    if (index < messages.length - 1) {
+      if (DateFormat('yyyy-MM-dd')
+              .format(DateTime.parse(messages[index].timestamp)) !=
+          DateFormat('yyyy-MM-dd')
+              .format(DateTime.parse(messages[index + 1].timestamp))) {
+        timeStamp = DateFormat('yyyy.MM.dd')
+            .format(DateTime.parse(messages[index].timestamp));
+        if (timeStamp == DateFormat('yyyy.MM.dd').format(today)) {
+          return timeStamp = 'Сегодня';
+        }
+        if (timeStamp ==
+            DateFormat('yyyy.MM.dd')
+                .format(today.subtract(const Duration(days: 1)))) {
+          return timeStamp = 'Вчера';
+        }
+        return timeStamp;
+      }
+    } else {
+      return timeStamp = DateFormat('yyyy.MM.dd')
+          .format(DateTime.parse(messages[index].timestamp));
     }
-
-    final int brightenFactor = 100;
-    final Color color1 = Color.fromARGB(
-        255,
-        _brightenColorComponent(r, brightenFactor),
-        _brightenColorComponent(g, brightenFactor),
-        _brightenColorComponent(b, brightenFactor));
-    final Color color2 = Color.fromARGB(
-        255,
-        _brightenColorComponent(r ~/ 2, brightenFactor),
-        _brightenColorComponent(g ~/ 2, brightenFactor),
-        _brightenColorComponent(b ~/ 2, brightenFactor));
-
-    return [color1, color2];
   }
 
-  AvatarPlaceholderModel(
-      {required this.initials, required this.gradientColorsToBack});
-}
+  late ChatModel chat;
+  ScrollController scrollController = ScrollController();
+  TextEditingController controller = TextEditingController();
 
-class MessageModel {
-  final String message;
-  final bool isMe;
-  factory MessageModel.fromJson(Map<String, dynamic> json) {
-    return MessageModel(
-      message: json['message'],
-      isMe: json['isMe'],
+  void onMessageSubmit() {
+    MessageModel model = MessageModel(
+        timestamp: DateTime.now().toString(),
+        message: controller.text.toString(),
+        isMe: true,
+        read: false);
+    chat.messages.insert(0, model);
+    controller.clear();
+    notifyListeners();
+    scrollController.animateTo(
+      scrollController.position.minScrollExtent,
+      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 500),
     );
   }
-
-  MessageModel({required this.message, required this.isMe});
 }

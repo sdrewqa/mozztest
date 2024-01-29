@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:mozztest/features/chat/presentation/providers/chat_provider.dart';
+import 'package:mozztest/features/chat/presentation/providers/chats_provider.dart';
 import 'package:mozztest/features/chat/presentation/widgets/chat_view_widget.dart';
 import 'package:provider/provider.dart';
+import 'chat_content_screen.dart';
 
-class ChatsScreen extends StatelessWidget {
-  const ChatsScreen({super.key});
+class ChatsPage extends StatelessWidget {
+  const ChatsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -63,18 +63,35 @@ class ChatsScreen extends StatelessWidget {
               height: 1,
               color: const Color.fromRGBO(237, 242, 246, 1),
             ),
-            Consumer<ChatProvider>(builder: (context, chatProvider, child) {
+            Consumer<ChatsProvider>(builder: (context, chatProvider, child) {
               if (chatProvider.userChats.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               } else {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemBuilder: (context, index) {
-                    return ChatViewWidget(
-                        chat: chatProvider.userChats, index: index);
-                  },
-                  itemCount: chatProvider.userChats.length,
+                return Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatContentPage(
+                                chat: chatProvider.userChats[index],
+                                indexChat: index,
+                              ),
+                            ),
+                          );
+                        },
+                        child: ChatViewWidget(
+                          chat: chatProvider.userChats[index],
+                          isChatsScreen: true,
+                        ),
+                      );
+                    },
+                    itemCount: chatProvider.userChats.length,
+                  ),
                 );
               }
             })
